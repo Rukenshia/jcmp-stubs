@@ -10,6 +10,9 @@ const types = {
   'boolean': [
     'bool',
   ],
+  'function': [
+    'class std::shared_ptr<class scr::IScriptFunction>',
+  ],
   
 
   // Special Conversions

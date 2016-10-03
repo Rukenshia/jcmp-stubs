@@ -21,16 +21,26 @@ class ClassBuilder {
     });
 
     data.forEach(obj => {
+      const cls = cb._classes.get(obj.name);
       obj.properties.forEach(prop => {
         const jsType = TypeHelper.toJSType(prop.type);
         log.debug(`property ${obj.name}.${prop.name} type: ${jsType}`);
 
         let defaultValue = TypeHelper.getDefaultValue(jsType);
 
-        cb._classes.get(obj.name).__metadata.properties[prop.name] = {
+        const cls = cb._classes.get(obj.name);
+        cls.__metadata.properties[prop.name] = {
           jsType,
           defaultValue,
         };
+      });
+
+      obj.functions.forEach(fn => {
+        fn.args.forEach((arg, idx) => {
+          const jsType = TypeHelper.toJSType(arg);
+          log.debug(`function ${obj.name}.${fn.name}[arg ${idx}] type: ${jsType}`);
+          cls.__metadata.functions[fn.name].args[idx].jsType = jsType;
+        });
       });
     });
 
@@ -86,8 +96,19 @@ class ClassBuilder {
       }
     };
     const genStub = info => {
+      cls.__metadata.functions[info.name] = {
+        args: [],
+      };
+      for (let i = 0; i < info.args.length; i++) {
+        cls.__metadata.functions[info.name].args.push({});
+      }
       return function(...args) {
         if (destroyGuard()) { return };
+
+        const metaArgs = cls.__metadata.functions[info.name].args;
+        if (metaArgs.length > args.length) {
+          throw new Error(`${obj.name}.${info.name}: expected ${metaArgs.length} arguments, found ${args.length}`);
+        }
         log.stub(`${obj.name}.${info.name}`);
       };
     };

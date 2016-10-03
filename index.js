@@ -16,7 +16,7 @@ const classes = ClassBuilder.fromDataObject(_serverData);
 
 const v = new (classes.getClass('Player'))();
 console.log(v.position);
-v.world.SetTime(1, 2, 3);
+v.world.SetTime(1, 'benis', 3);
 
 module.exports = {
   events: new EventSystem(),
