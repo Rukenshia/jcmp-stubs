@@ -36,6 +36,9 @@ class ClassBuilder {
       });
 
       obj.functions.forEach(fn => {
+        const returnJsType = TypeHelper.toJSType(fn.returnType);
+          log.debug(`function ${obj.name}.${fn.name} return type: ${returnJsType}`);
+        cls.__metadata.functions[fn.name].jsReturnType = returnJsType;
         fn.args.forEach((arg, idx) => {
           const jsType = TypeHelper.toJSType(arg);
           log.debug(`function ${obj.name}.${fn.name}[arg ${idx}] type: ${jsType}`);
