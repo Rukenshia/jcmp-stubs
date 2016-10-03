@@ -1,6 +1,7 @@
 'use strict';
 
 const { TypeHelper } = require('./typeHelper');
+const constructors = require('./constructors');
 
 class ClassBuilder {
   constructor() {
@@ -80,16 +81,20 @@ class ClassBuilder {
     const cb = this;
     const clsObj = {
       _destroyed: false,
-      [obj.name]: function() {
+      [obj.name]: function(...args) {
         if (!obj.isConstructible) {
           log.warn(`Constructing non-constructible class '${obj.name}'`);
         }
-        log.stub(`${obj.name}.constructor`);
+        log.stub(`${obj.name}.constructor(${args.join(', ')})`);
 
         for (const propName in cls.__metadata.properties) {
           this.__metadata.properties[propName] = {
             value: TypeHelper.getDefaultValue(cls.__metadata.properties[propName].jsType),
           };
+        }
+
+        if (typeof constructors[obj.name] !== 'undefined') {
+          constructors[obj.name].bind(this)(...args);
         }
       }
     };
@@ -136,7 +141,7 @@ class ClassBuilder {
             throw new Error(`${obj.name}.${info.name} argument ${i + 1}: expected ${metaArg.jsType}, got ${typeof arg}`);
           }
         }
-        log.stub(`${obj.name}.${info.name}`);
+        log.stub(`${obj.name}.${info.name}(${args.join(', ')})`);
 
         return TypeHelper.getDefaultValue(cls.__metadata.functions[info.name].jsReturnType);
       };
@@ -157,7 +162,10 @@ class ClassBuilder {
           log.error(`trying to set readOnly ${obj.name}.${info.name}`);
           return;  
         }
-        log.stub(`set ${obj.name}.${info.name} -- TODO: TYPECHECK`);
+        if (!cb._checkType(cls.__metadata.properties[info.name].jsType, value)) {
+          throw new Error(`cannot set value of ${obj.name}.${info.name}: expected ${cls.__metadata.properties[info.name].jsType}, got ${typeof value}`);
+        }
+        log.stub(`set ${obj.name}.${info.name}`);
         this.__metadata.properties[info.name].value = value;
       };
     }

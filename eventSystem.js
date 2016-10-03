@@ -22,29 +22,47 @@ class EventSystem {
   }
 
   _genericCall(map, name, ...args) {
+    const retns = [];
     if (map.has(name)) {
-      map.get(name).forEach(fn => fn(...args));
+      map.get(name).forEach(fn => retns.push(fn(...args)));
     }
+    return retns;
   }
 
   Add(name, func) {
+    log.stub(`EventSystem.Add(${name}, ${typeof func})`);
     this._genericAdd(this._events, name, func);
   }
 
   AddRemoteCallable(name, func) {
+    log.stub(`EventSystem.AddRemoteCallable(${name}, ${typeof func})`);
     this._genericAdd(this._remoteEvents, name, func);
   }
 
-  fakeCall(name) {
+  Call(name, ...args) {
+    log.stub(`EventSystem.Call(${name}${args.length > 0 ? `, ${args.join(', ')}` : ''})`);
+    return this._genericCall(this._events, name, ...args);
+  }
+
+  CallRemote(name, target, ...args) {
+    log.stub(`EventSystem.Call(${name}, ${target}${args.length > 0 ? `, ${args.join(', ')}` : ''})`);
+    return this._genericCall(this._remoteEvents, name, ...args);
+  }
+
+  fakeCall(name, ...customArgs) {
     if (!this._builtins.has(name)) {
       log.error(`invalid fakeCall to '${name}`);
       return;
     }
 
     const args = [];
-    this._builtins.get(name).forEach(({ ptype }) => {
-      args.push(TypeHelper.getDefaultValue(ptype));
-    });
+    if (customArgs.length > 0) {
+      args.push(...customArgs);
+    } else {
+      this._builtins.get(name).forEach(({ ptype }) => {
+        args.push(TypeHelper.getDefaultValue(ptype));
+      });
+    }
 
     log.stub(`fake event call to '${name}'`);
     this._genericCall(this._events, name, ...args);
