@@ -23,4 +23,4 @@ class EventSystem {
   }
 }
 
-module.exports = EventSystem;
+module.exports = { EventSystem };
