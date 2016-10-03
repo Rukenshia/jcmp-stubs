@@ -85,10 +85,10 @@ class ClassBuilder {
         return true;
       }
     };
-    const genStub = name => {
-      return () => {
+    const genStub = info => {
+      return function(...args) {
         if (destroyGuard()) { return };
-        log.stub(`${obj.name}.${name}`);
+        log.stub(`${obj.name}.${info.name}`);
       };
     };
     const genGet = name => {
@@ -120,7 +120,7 @@ class ClassBuilder {
 
     obj.functions.forEach(fn => {
       if (fn.name === 'Destroy') { return; }
-      cls.prototype[fn.name] = genStub(fn.name);
+      cls.prototype[fn.name] = genStub(fn);
     });
 
     obj.properties.forEach(prop => {
