@@ -26,19 +26,19 @@ class ClassBuilder {
         const jsType = TypeHelper.toJSType(prop.type);
         log.debug(`property ${obj.name}.${prop.name} type: ${jsType}`);
 
-        let defaultValue = TypeHelper.getDefaultValue(jsType);
-
         const cls = cb._classes.get(obj.name);
         cls.__metadata.properties[prop.name] = {
           jsType,
-          defaultValue,
         };
       });
 
       obj.functions.forEach(fn => {
-        const returnJsType = TypeHelper.toJSType(fn.returnType);
-          log.debug(`function ${obj.name}.${fn.name} return type: ${returnJsType}`);
-        cls.__metadata.functions[fn.name].jsReturnType = returnJsType;
+        if (fn.name === 'Destroy') {
+          return;
+        }
+        const jsReturnType = TypeHelper.toJSType(fn.returnType);
+        log.debug(`function ${obj.name}.${fn.name} return type: ${jsReturnType}`);
+        cls.__metadata.functions[fn.name].jsReturnType = jsReturnType;
         fn.args.forEach((arg, idx) => {
           const jsType = TypeHelper.toJSType(arg);
           log.debug(`function ${obj.name}.${fn.name}[arg ${idx}] type: ${jsType}`);
@@ -54,6 +54,38 @@ class ClassBuilder {
     return this._classes.get(name);
   }
 
+  _getDefaultValue(jsType) {
+    let defaultValue = TypeHelper.getDefaultValue(jsType);
+    if (typeof defaultValue === 'undefined' && this._classes.has(jsType)) {
+      // try to construct the default value
+      const defaultCls = this._classes.get(jsType);
+      defaultValue = new defaultCls();
+    }
+    return defaultValue;
+  }
+
+  _checkType(expected, present) {
+    const presentType = typeof present;
+    if (presentType !== expected) {
+      if (presentType === 'object') {
+        const possibleClasses = [expected];
+        if (expected === 'Entity') {
+          possibleClasses.push(...TypeHelper.entities);
+        }
+        for (let clsName of possibleClasses) {
+          if (this._classes.has(clsName)) {
+            const cls = this._classes.get(clsName);
+            if (present instanceof cls) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    }
+    return true;
+  }
+
   _buildClass(obj) {
     const cb = this;
     const clsObj = {
@@ -66,14 +98,8 @@ class ClassBuilder {
 
         for (const propName in cls.__metadata.properties) {
           if (typeof this.__metadata.properties[propName] === 'undefined') {
-            let defaultValue = cls.__metadata.properties[propName].defaultValue;
-            if (typeof defaultValue === 'undefined' && cb._classes.has(cls.__metadata.properties[propName].jsType)) {
-              // try to construct the default value
-              const defaultCls = cb._classes.get(cls.__metadata.properties[propName].jsType);
-              defaultValue = new defaultCls();
-            }
             this.__metadata.properties[propName] = {
-              value: defaultValue,
+              value: cb._getDefaultValue(cls.__metadata.properties[propName].jsType),
             };
           }
         }
@@ -112,7 +138,18 @@ class ClassBuilder {
         if (metaArgs.length > args.length) {
           throw new Error(`${obj.name}.${info.name}: expected ${metaArgs.length} arguments, found ${args.length}`);
         }
+
+        for (let i = 0; i < metaArgs.length; i++) {
+          const metaArg = metaArgs[i];
+          const arg = args[i];
+
+          if (!cb._checkType(metaArg.jsType, arg)) {
+            throw new Error(`${obj.name}.${info.name} argument ${i + 1}: expected ${metaArg.jsType}, got ${typeof arg}`);
+          }
+        }
         log.stub(`${obj.name}.${info.name}`);
+
+        return cb._getDefaultValue(cls.__metadata.functions[info.name].jsReturnType);
       };
     };
     const genGet = name => {

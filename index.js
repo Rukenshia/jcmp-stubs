@@ -14,9 +14,14 @@ const { ClassBuilder } = require('./classBuilder');
 
 const classes = ClassBuilder.fromDataObject(_serverData);
 
-const v = new (classes.getClass('Player'))();
+const p = new (classes.getClass('Player'))();
+console.log(p.position);
+p.world.SetTime(1, 2, 3);
+console.log(p.name);
+
+const v = new (classes.getClass('Vehicle'))();
 console.log(v.position);
-v.world.SetTime(1, 'benis', 3);
+v.SetOccupant(1, p);
 
 module.exports = {
   events: new EventSystem(),

@@ -13,6 +13,9 @@ const types = {
   'function': [
     'class std::shared_ptr<class scr::IScriptFunction>',
   ],
+  'undefined': [
+    'void',
+  ],
   
 
   // Special Conversions
@@ -44,6 +47,10 @@ class TypeHelper {
 
     types[name].push(new RegExp(`^struct ${name}$`));
     types[name].push(new RegExp(`class (\\w+::)?I?${name} \\* __ptr64`));
+  }
+
+  static get entities() {
+    return ['Player', 'Vehicle'];
   }
 
   static toJSType(raw) {
@@ -81,7 +88,7 @@ class TypeHelper {
       'object': {},
       'Array': [],
       'boolean': false,
-    }[typeName] || undefined;
+    }[typeName];
   }
 }
 
