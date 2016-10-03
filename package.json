@@ -1,0 +1,14 @@
+{
+  "name": "jcmp-stubs",
+  "version": "1.0.0",
+  "description": "Use the JC3MP Scripting API without the JC3:MP Server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jan Christophersen <jan@ruken.pw>",
+  "license": "MIT",
+  "dependencies": {
+    "custom-logger": "^0.3.1"
+  }
+}
