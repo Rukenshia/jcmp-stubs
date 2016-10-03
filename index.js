@@ -14,8 +14,8 @@ const { ClassBuilder } = require('./classBuilder');
 
 const classes = ClassBuilder.fromDataObject(_serverData);
 
-const v = new (classes.getClass('Vehicle'))();
-console.log(v.driver);
+const v = new (classes.getClass('Player'))();
+console.log(v.position);
 
 module.exports = {
   events: new EventSystem(),

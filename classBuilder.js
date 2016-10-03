@@ -25,7 +25,8 @@ class ClassBuilder {
         const jsType = TypeHelper.toJSType(prop.type);
         log.debug(`property ${obj.name}.${prop.name} type: ${jsType}`);
 
-        const defaultValue = prop.isWriteable ? TypeHelper.getDefaultValue(jsType) : undefined;
+        let defaultValue = TypeHelper.getDefaultValue(jsType);
+
         cb._classes.get(obj.name).__metadata.properties[prop.name] = {
           jsType,
           defaultValue,
@@ -41,6 +42,7 @@ class ClassBuilder {
   }
 
   _buildClass(obj) {
+    const cb = this;
     const clsObj = {
       _destroyed: false,
       [obj.name]: function() {
@@ -51,8 +53,14 @@ class ClassBuilder {
 
         for (const propName in cls.__metadata.properties) {
           if (typeof this.__metadata.properties[propName] === 'undefined') {
+            let defaultValue = cls.__metadata.properties[propName].defaultValue;
+            if (typeof defaultValue === 'undefined' && cb._classes.has(cls.__metadata.properties[propName].jsType)) {
+              // try to construct the default value
+              const defaultCls = cb._classes.get(cls.__metadata.properties[propName].jsType);
+              defaultValue = new defaultCls();
+            }
             this.__metadata.properties[propName] = {
-              value: cls.__metadata.properties[propName].defaultValue,
+              value: defaultValue,
             };
           }
         }
@@ -60,6 +68,7 @@ class ClassBuilder {
     };
     const cls = clsObj[obj.name];
     cls.__metadata = {
+      constructible: obj.isConstructible,
       properties: {},
       functions: {},
     };
