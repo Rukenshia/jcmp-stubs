@@ -34,7 +34,7 @@ const types = {
   'Entity': [
     /class ISyncableEntity( * __ptr64)?/,
   ],
-  'PlayerNametag': [
+  'PlayerNameTag': [
     /class Nametag( * __ptr64)?/,
   ],
 }
@@ -81,7 +81,7 @@ class TypeHelper {
     return jsType;
   }
 
-  static getDefaultValue(typeName) {
+  static _getDefaultJSValue(typeName) {
     return {
       'string': '',
       'number': 0,
@@ -89,6 +89,16 @@ class TypeHelper {
       'Array': [],
       'boolean': false,
     }[typeName];
+  }
+
+  static getDefaultValue(jsType) {
+    let defaultValue = TypeHelper._getDefaultJSValue(jsType);
+    if (typeof defaultValue === 'undefined' && classBuilder._classes.has(jsType)) {
+      // try to construct the default value
+      const defaultCls = classBuilder._classes.get(jsType);
+      defaultValue = new defaultCls();
+    }
+    return defaultValue;
   }
 }
 

@@ -54,16 +54,6 @@ class ClassBuilder {
     return this._classes.get(name);
   }
 
-  _getDefaultValue(jsType) {
-    let defaultValue = TypeHelper.getDefaultValue(jsType);
-    if (typeof defaultValue === 'undefined' && this._classes.has(jsType)) {
-      // try to construct the default value
-      const defaultCls = this._classes.get(jsType);
-      defaultValue = new defaultCls();
-    }
-    return defaultValue;
-  }
-
   _checkType(expected, present) {
     const presentType = typeof present;
     if (presentType !== expected) {
@@ -97,11 +87,9 @@ class ClassBuilder {
         log.stub(`${obj.name}.constructor`);
 
         for (const propName in cls.__metadata.properties) {
-          if (typeof this.__metadata.properties[propName] === 'undefined') {
-            this.__metadata.properties[propName] = {
-              value: cb._getDefaultValue(cls.__metadata.properties[propName].jsType),
-            };
-          }
+          this.__metadata.properties[propName] = {
+            value: TypeHelper.getDefaultValue(cls.__metadata.properties[propName].jsType),
+          };
         }
       }
     };
@@ -125,6 +113,7 @@ class ClassBuilder {
       }
     };
     const genStub = info => {
+      log.debug(`genStub(${obj.name}.${info.name})`);
       cls.__metadata.functions[info.name] = {
         args: [],
       };
@@ -149,10 +138,11 @@ class ClassBuilder {
         }
         log.stub(`${obj.name}.${info.name}`);
 
-        return cb._getDefaultValue(cls.__metadata.functions[info.name].jsReturnType);
+        return TypeHelper.getDefaultValue(cls.__metadata.functions[info.name].jsReturnType);
       };
     };
     const genGet = name => {
+      log.debug(`genGet(${obj.name}.${name})`);
       return function() {
         if (destroyGuard()) { return };
         log.stub(`get ${obj.name}.${name}`);
@@ -160,6 +150,7 @@ class ClassBuilder {
       };
     };
     const genSet = info => {
+      log.debug(`genSet(${obj.name}.${info.name})`);
       return function(value) {
         if (destroyGuard()) { return };
         if (!info.isWriteable) {

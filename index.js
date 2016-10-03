@@ -10,29 +10,28 @@ global.log = require('custom-logger').new({
 
 const { EventSystem } = require('./eventSystem');
 const _serverData = require('./data_server.json');
+const _serverEvents = require('./events_server.json');
 const { ClassBuilder } = require('./classBuilder');
 
-const classes = ClassBuilder.fromDataObject(_serverData);
+const classBuilder = global.classBuilder = ClassBuilder.fromDataObject(_serverData);
+const globalClass = new (classBuilder.getClass('global'))();
+const eventSystem = new EventSystem(_serverEvents);
+globalClass.__metadata.properties['events'].value = eventSystem;
 
-const p = new (classes.getClass('Player'))();
-console.log(p.position);
-p.world.SetTime(1, 2, 3);
-console.log(p.name);
+module.exports = globalClass;
 
-const v = new (classes.getClass('Vehicle'))();
-console.log(v.position);
-v.SetOccupant(1, p);
-
-module.exports = {
-  events: new EventSystem(),
-  jcmp: {
-
-  },
-};
-
-classes._classes.forEach((cls, name) => {
+classBuilder._classes.forEach((cls, name) => {
   if (name === 'EventSystem') {
     return;
   }
   module.exports[name] = cls;
 });
+
+console.log(module.exports.events);
+console.log(module.exports.events);
+
+eventSystem.Add('PlayerCreated', p => {
+  console.log(p);
+});
+
+eventSystem.fakeCall('PlayerCreated');
