@@ -14,6 +14,9 @@ const { ClassBuilder } = require('./classBuilder');
 
 const classes = ClassBuilder.fromDataObject(_serverData);
 
+const v = new (classes.getClass('Vehicle'))();
+console.log(v.driver);
+
 module.exports = {
   events: new EventSystem(),
   jcmp: {
