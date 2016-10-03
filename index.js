@@ -1,5 +1,6 @@
 'use strict';
 
+// Logger Setup
 global.log = require('custom-logger').new({
   debug: { color: 'grey', level: 0, event: 'debug' },
   stub: { color: 'cyan', level: 1, event: 'stub' },
@@ -14,11 +15,15 @@ const _serverEvents = require('./events_server.json');
 const { ClassBuilder } = require('./classBuilder');
 const { ClassHelper } = require('./classHelper');
 
-const classBuilder = global.classBuilder = ClassBuilder.fromDataObject(_serverData);
+/** @type {ClassBuilder} */ const classBuilder = global.classBuilder = ClassBuilder.fromDataObject(_serverData);
 const globalClass = new (classBuilder.getClass('global'))();
 const eventSystem = new EventSystem(_serverEvents);
 globalClass.__metadata.properties['events'].value = eventSystem;
 
+/**
+ * Exporting Helper Class
+ * 
+ */
 module.exports = {
   _helper: ClassHelper,
 };

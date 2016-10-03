@@ -39,7 +39,16 @@ const types = {
   ],
 }
 
+/**
+ * Class to determine C++ types and offer conversion functions
+ */
 class TypeHelper {
+  /**
+   * Adds a Class to the Type Helper
+   * 
+   * @static
+   * @param {string} name
+   */
   static addClass(name) {
     if (typeof types[name] === 'undefined') {
       types[name] = [];
@@ -49,10 +58,22 @@ class TypeHelper {
     types[name].push(new RegExp(`class (\\w+::)?I?${name} \\* __ptr64`));
   }
 
+  /**
+   * Returns Entity classes
+   * 
+   * @static
+   * @returns {Array<string>}
+   */
   static get entities() {
     return ['Player', 'Vehicle'];
   }
 
+  /**
+   * Returns the JS type string of a C++ type string
+   * 
+   * @param {string} raw
+   * @returns {string}
+   */
   static toJSType(raw) {
     let jsType = null;
     for (const key in types) {
@@ -81,6 +102,14 @@ class TypeHelper {
     return jsType;
   }
 
+  /**
+   * Returns the default value of a JS type
+   * 
+   * @private
+   * @static
+   * @param {string} typeName
+   * @param {any}
+   */
   static _getDefaultJSValue(typeName) {
     return {
       'string': '',
@@ -91,6 +120,13 @@ class TypeHelper {
     }[typeName];
   }
 
+  /**
+   * Returns the default value for a type (JS or generated Class)
+   * 
+   * @static
+   * @param {string} jsType
+   * @returns {any}
+   */
   static getDefaultValue(jsType) {
     let defaultValue = TypeHelper._getDefaultJSValue(jsType);
     if (typeof defaultValue === 'undefined' && classBuilder._classes.has(jsType)) {

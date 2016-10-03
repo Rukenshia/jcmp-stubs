@@ -3,18 +3,67 @@
 const { TypeHelper } = require('./typeHelper');
 const constructors = require('./constructors');
 
+/**
+ * A Scripting Class
+ * @typedef {object} Class
+ */
+/**
+ * A Scripting Parameter
+ * @typedef {any} Parameter
+ */
+/**
+ * A Scripting function
+ * @typedef {function()} Function
+ */
+/**
+ * Property info
+ * @typedef {object} Property
+ * @type {object}
+ * @property {string} name 
+ * @property {string} type
+ * @property {boolean} isWriteable
+ */
+/**
+ * Function info
+ * @typedef {object} FunctionInfo
+ * @type {object}
+ * @property {string} name 
+ * @property {string} returnType
+ * @property {Array<string>} args
+ */
+
+
+/**
+ * ClassBuilder is responisble for creating JS Classes for the Data received from the scripting-docs json files.
+ */
 class ClassBuilder {
+  /**
+   * Creates a new instance of ClassBuilder
+   */
   constructor() {
-    this._classes = new Map();
+    /** @type {Map<string, Class>} */ this._classes = new Map();
 
     this._addHelperClasses();
   }
 
+  /**
+   * Adds proprietary helper Classes
+   * 
+   * @private
+   */
   _addHelperClasses() {
     this._classes.set('Entity', class Entity { });
     TypeHelper.addClass(this._classes.get('Entity'));
   }
 
+  /**
+   * Creates a new ClassBuilder from JSON object data
+   * 
+   * @static
+   * @param {Array<object>} data - object data from the scripting-docs
+   * 
+   * @returns {ClassBuilder}
+   */
   static fromDataObject(data) {
     const cb = new ClassBuilder();
     data.forEach(obj => {
@@ -51,10 +100,24 @@ class ClassBuilder {
     return cb;
   }
 
+  /**
+   * Helper function to retrieve a Class from the Builder.
+   * 
+   * @param {string} name - class name
+   * @returns {Class}
+   */
   getClass(name) {
     return this._classes.get(name);
   }
 
+  /**
+   * Checks the argument type
+   * 
+   * @private
+   * @param {*} expected - expected type
+   * @param {*} present - present value(!)
+   * @returns {boolean}
+   */
   _checkType(expected, present) {
     const presentType = typeof present;
     if (presentType !== expected) {
@@ -77,6 +140,16 @@ class ClassBuilder {
     return true;
   }
 
+  /**
+   * Creates a new class from the object data.
+   * 
+   * @private
+   * @param {object} obj - object data
+   * @param {boolean} isConstructible
+   * @param {boolean} isAutoDestroy
+   * @param {Array<PropertyInfo>} properties
+   * @param {Array<FunctionInfo>} functions
+   */
   _buildClass(obj) {
     const cb = this;
     const clsObj = {
