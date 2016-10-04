@@ -8,7 +8,7 @@
     "generate-docs": "node_modules/.bin/jsdoc -c jsdoc.json -t node_modules/docdash --private"
   },
   "author": "Jan Christophersen <jan@ruken.pw>",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "dependencies": {
     "custom-logger": "^0.3.1"
   },
