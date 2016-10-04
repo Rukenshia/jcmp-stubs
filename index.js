@@ -3,7 +3,9 @@
 // Logger Setup
 global.log = require('custom-logger').new({
   debug: { color: 'grey', level: 0, event: 'debug' },
-  stub: { color: 'cyan', level: 1, event: 'stub' },
+  fstub: { color: 'magenta', level: 1, event: 'function' },
+  pstub: { color: 'cyan', level: 1, event: 'property' },
+  event: { color: 'blue', level: 1, event: 'event' },
   info: { color: 'green', level: 2, event: 'info' },
   warn: { color: 'yellow', level: 3, event: 'warning' },
   error: { color: 'red', level: 4, event: 'ERROR' },

@@ -77,7 +77,7 @@ class EventSystem {
    * @param {function} func
    */
   Add(name, func) {
-    log.stub(`EventSystem.Add(${name}, ${typeof func})`);
+    log.fstub(`EventSystem.Add(${name}, ${typeof func})`);
     this._genericAdd(this._events, name, func);
   }
 
@@ -88,7 +88,7 @@ class EventSystem {
    * @param {function} func
    */
   AddRemoteCallable(name, func) {
-    log.stub(`EventSystem.AddRemoteCallable(${name}, ${typeof func})`);
+    log.fstub(`EventSystem.AddRemoteCallable(${name}, ${typeof func})`);
     this._genericAdd(this._remoteEvents, name, func);
   }
 
@@ -100,7 +100,7 @@ class EventSystem {
    * @returns {Array<any>}
    */
   Call(name, ...args) {
-    log.stub(`EventSystem.Call(${name}${args.length > 0 ? `, ${args.join(', ')}` : ''})`);
+    log.event(`EventSystem.Call(${name}${args.length > 0 ? `, ${args.join(', ')}` : ''})`);
     return this._genericCall(this._events, name, ...args);
   }
 
@@ -114,7 +114,7 @@ class EventSystem {
    * @returns {Array<any>}
    */
   CallRemote(name, target, ...args) {
-    log.stub(`EventSystem.Call(${name}, ${target}${args.length > 0 ? `, ${args.join(', ')}` : ''})`);
+    log.event(`EventSystem.Call(${name}, ${target}${args.length > 0 ? `, ${args.join(', ')}` : ''})`);
     return this._genericCall(this._remoteEvents, name, ...args);
   }
 
@@ -141,7 +141,7 @@ class EventSystem {
       });
     }
 
-    log.stub(`fake event call to '${name}'`);
+    log.event(`fake event call to '${name}'`);
     return this._genericCall(this._events, name, ...args);
   }
 }

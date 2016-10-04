@@ -14,7 +14,15 @@ const constructors = {
 };
 
 constructors.Player = function() { ClassHelper.setPropertyUnchecked(this, 'vehicle', null); };
-constructors.Vehicle = function(hash, pos = new Vector3(), rot = new Vector3()) { this.modelHash = hash; this.position = pos; this.rotation = rot };
+constructors.Vehicle = function(hash, pos = new Vector3(), rot = new Vector3()) {
+  ClassHelper.setPropertyUnchecked(this, 'driver', null);
+  this.modelHash = hash;
+  this.position = pos;
+  this.rotation = rot;
+};
+constructors.RemoteClient = function() {
+  this.abc = '123';
+};
 constructors.Checkpoint = function(hash, pos = new Vector3(), rot = new Vector3()) { this.modelHash = hash; this.position = pos; this.rotation = rot };
 constructors.GameObject = function(hash, pos = new Vector3(), rot = new Vector3()) { this.model = hash; this.position = pos; this.rotation = rot };
 constructors.POI = function(type, pos = new Vector3(), rot = new Vector3()) { this.type = type; this.position = pos; this.rotation = rot };

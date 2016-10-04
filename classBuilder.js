@@ -161,14 +161,20 @@ class ClassBuilder {
         if (!obj.isConstructible) {
           log.warn(`Constructing non-constructible class '${obj.name}'`);
         }
-        log.stub(`${obj.name}.constructor(${args.join(', ')})`);
+        log.fstub(`${obj.name}.constructor(${args.join(', ')})`);
 
-        this.__metadata.enableSetterGuard = false;
-        this.__metadata.destroyed = false;
+        this.__metadata = {
+          enableSetterGuard: false,
+          destroyed: false,
+          properties: {},
+          functions: {},
+        };
+
+        const unset = Symbol('UNSET_VALUE');
 
         // create the properties, but leave them empty for now
         for (const propName in cls.__metadata.properties) {
-          this.__metadata.properties[propName] = { value: undefined };
+          this.__metadata.properties[propName] = { value: unset };
         }
 
         if (typeof constructors[obj.name] !== 'undefined') {
@@ -178,7 +184,8 @@ class ClassBuilder {
         this.__metadata.enableSetterGuard = true;
 
         for (const propName in cls.__metadata.properties) {
-          if (typeof this.__metadata.properties[propName].value === 'undefined') {
+          if (this.__metadata.properties[propName].value === unset) {
+            log.debug(`using default value for prop ${propName}`);
             this.__metadata.properties[propName] = {
               value: TypeHelper.getDefaultValue(cls.__metadata.properties[propName].jsType),
             };
@@ -189,10 +196,6 @@ class ClassBuilder {
     const cls = clsObj[obj.name];
     cls.__metadata = {
       constructible: obj.isConstructible,
-      properties: {},
-      functions: {},
-    };
-    cls.prototype.__metadata = {
       properties: {},
       functions: {},
     };
@@ -231,7 +234,7 @@ class ClassBuilder {
             throw new Error(`${obj.name}.${info.name} argument ${i + 1}: expected ${metaArg.jsType}, got ${typeof arg}`);
           }
         }
-        log.stub(`${obj.name}.${info.name}(${args.join(', ')})`);
+        log.fstub(`${obj.name}.${info.name}(${args.join(', ')})`);
 
         if (typeof classHooks[info.name] !== 'undefined') {
           log.debug(`executing hook for ${obj.name}.${info.name}`);
@@ -245,7 +248,7 @@ class ClassBuilder {
       log.debug(`genGet(${obj.name}.${name})`);
       return function() {
         if (destroyGuard.bind(this)()) { return };
-        log.stub(`get ${obj.name}.${name}`);
+        log.pstub(`get ${obj.name}.${name}`);
         return this.__metadata.properties[name].value;
       };
     };
@@ -260,7 +263,7 @@ class ClassBuilder {
         if (!cb._checkType(cls.__metadata.properties[info.name].jsType, value)) {
           throw new Error(`cannot set value of ${obj.name}.${info.name}: expected ${cls.__metadata.properties[info.name].jsType}, got ${typeof value}`);
         }
-        log.stub(`set ${obj.name}.${info.name}`);
+        log.pstub(`set ${obj.name}.${info.name}`);
         this.__metadata.properties[info.name].value = value;
       };
     }
