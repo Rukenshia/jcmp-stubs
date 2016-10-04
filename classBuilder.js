@@ -185,7 +185,6 @@ class ClassBuilder {
 
         for (const propName in cls.__metadata.properties) {
           if (this.__metadata.properties[propName].value === unset) {
-            log.debug(`using default value for prop ${propName}`);
             this.__metadata.properties[propName] = {
               value: TypeHelper.getDefaultValue(cls.__metadata.properties[propName].jsType),
             };
