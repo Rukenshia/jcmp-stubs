@@ -270,6 +270,10 @@ class ClassBuilder {
     if (!obj.isAutoDestroy) {
       cls.prototype.Destroy = function() {
         if (destroyGuard.bind(this)()) { return };
+        
+        if (typeof classHooks[info.name] !== 'undefined') {
+          classHooks[info.name].bind(this)();  
+        }
         this.__metadata.destroyed = true;
         log.debug(`instance of ${obj.name} destroyed`);
       }
