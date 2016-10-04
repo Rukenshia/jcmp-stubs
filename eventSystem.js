@@ -124,6 +124,7 @@ class EventSystem {
    * 
    * @param {string} name
    * @param {any} ...args
+   * @returns {Array<any>}
    */
   fakeCall(name, ...customArgs) {
     if (!this._builtins.has(name)) {
@@ -141,7 +142,7 @@ class EventSystem {
     }
 
     log.stub(`fake event call to '${name}'`);
-    this._genericCall(this._events, name, ...args);
+    return this._genericCall(this._events, name, ...args);
   }
 }
 
