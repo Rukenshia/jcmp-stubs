@@ -1,7 +1,8 @@
 'use strict';
 
 const { TypeHelper } = require('./typeHelper');
-const constructors = require('./constructors');
+const { constructors, similarClasses } = require('./overrides');
+const hooks = require('./hooks');
 
 /**
  * A Scripting Class
@@ -126,6 +127,9 @@ class ClassBuilder {
         if (expected === 'Entity') {
           possibleClasses.push(...TypeHelper.entities);
         }
+        if (typeof similarClasses[expected] !== 'undefined') {
+          possibleClasses.push(...similarClasses[expected]);
+        }
         for (let clsName of possibleClasses) {
           if (this._classes.has(clsName)) {
             const cls = this._classes.get(clsName);
@@ -153,21 +157,32 @@ class ClassBuilder {
   _buildClass(obj) {
     const cb = this;
     const clsObj = {
-      _destroyed: false,
       [obj.name]: function(...args) {
         if (!obj.isConstructible) {
           log.warn(`Constructing non-constructible class '${obj.name}'`);
         }
         log.stub(`${obj.name}.constructor(${args.join(', ')})`);
 
+        this.__metadata.enableSetterGuard = false;
+        this.__metadata.destroyed = false;
+
+        // create the properties, but leave them empty for now
         for (const propName in cls.__metadata.properties) {
-          this.__metadata.properties[propName] = {
-            value: TypeHelper.getDefaultValue(cls.__metadata.properties[propName].jsType),
-          };
+          this.__metadata.properties[propName] = { value: undefined };
         }
 
         if (typeof constructors[obj.name] !== 'undefined') {
           constructors[obj.name].bind(this)(...args);
+        }
+
+        this.__metadata.enableSetterGuard = true;
+
+        for (const propName in cls.__metadata.properties) {
+          if (typeof this.__metadata.properties[propName].value === 'undefined') {
+            this.__metadata.properties[propName] = {
+              value: TypeHelper.getDefaultValue(cls.__metadata.properties[propName].jsType),
+            };
+          }
         }
       }
     };
@@ -182,10 +197,12 @@ class ClassBuilder {
       functions: {},
     };
 
+    const classHooks = hooks[obj.name] || {};
+
     TypeHelper.addClass(obj.name);
 
-    const destroyGuard = () => {
-      if (clsObj._destroyed) {
+    const destroyGuard = function() {
+      if (this.__metadata.destroyed) {
         log.error(`used instance of ${obj.name} has been destroyed!`);
         return true;
       }
@@ -199,7 +216,7 @@ class ClassBuilder {
         cls.__metadata.functions[info.name].args.push({});
       }
       return function(...args) {
-        if (destroyGuard()) { return };
+        if (destroyGuard.bind(this)()) { return };
 
         const metaArgs = cls.__metadata.functions[info.name].args;
         if (metaArgs.length > args.length) {
@@ -216,13 +233,18 @@ class ClassBuilder {
         }
         log.stub(`${obj.name}.${info.name}(${args.join(', ')})`);
 
+        if (typeof classHooks[info.name] !== 'undefined') {
+          log.debug(`executing hook for ${obj.name}.${info.name}`);
+          return classHooks[info.name].bind(this)(...args) || TypeHelper.getDefaultValue(cls.__metadata.functions[info.name].jsReturnType);
+        }
+
         return TypeHelper.getDefaultValue(cls.__metadata.functions[info.name].jsReturnType);
       };
     };
     const genGet = name => {
       log.debug(`genGet(${obj.name}.${name})`);
       return function() {
-        if (destroyGuard()) { return };
+        if (destroyGuard.bind(this)()) { return };
         log.stub(`get ${obj.name}.${name}`);
         return this.__metadata.properties[name].value;
       };
@@ -230,8 +252,8 @@ class ClassBuilder {
     const genSet = info => {
       log.debug(`genSet(${obj.name}.${info.name})`);
       return function(value) {
-        if (destroyGuard()) { return };
-        if (!info.isWriteable) {
+        if (destroyGuard.bind(this)()) { return };
+        if (!info.isWriteable && this.__metadata.enableSetterGuard) {
           log.error(`trying to set readOnly ${obj.name}.${info.name}`);
           return;  
         }
@@ -244,9 +266,9 @@ class ClassBuilder {
     }
 
     if (!obj.isAutoDestroy) {
-      cls.prototype.Destroy = () => {
-        if (destroyGuard()) { return };
-        clsObj._destroyed = true;
+      cls.prototype.Destroy = function() {
+        if (destroyGuard.bind(this)()) { return };
+        this.__metadata.destroyed = true;
         log.debug(`instance of ${obj.name} destroyed`);
       }
     }
