@@ -256,8 +256,7 @@ class ClassBuilder {
       return function(value) {
         if (destroyGuard.bind(this)()) { return };
         if (!info.isWriteable && this.__metadata.enableSetterGuard) {
-          log.error(`trying to set readOnly ${obj.name}.${info.name}`);
-          return;  
+          throw new Error(`cannot set readOnly ${obj.name}.${info.name}!`);
         }
         if (!cb._checkType(cls.__metadata.properties[info.name].jsType, value)) {
           throw new Error(`cannot set value of ${obj.name}.${info.name}: expected ${cls.__metadata.properties[info.name].jsType}, got ${typeof value}`);
