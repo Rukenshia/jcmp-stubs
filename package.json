@@ -4,16 +4,16 @@
   "description": "Use the JC3MP Scripting API without the JC3:MP Server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --reporter spec",
     "generate-docs": "node_modules/.bin/jsdoc -c jsdoc.json -t node_modules/docdash --private"
   },
   "author": "Jan Christophersen <jan@ruken.pw>",
   "license": "GPL-3.0",
-  "dependencies": {
-    "custom-logger": "^0.3.1"
-  },
   "devDependencies": {
     "docdash": "^0.4.0",
-    "jsdoc": "^3.4.2"
+    "jsdoc": "^3.4.2",
+    "chai": "^3.5.0",
+    "custom-logger": "^0.3.1",
+    "mocha": "^3.1.2"
   }
 }

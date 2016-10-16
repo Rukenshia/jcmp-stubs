@@ -1,5 +1,6 @@
 'use strict';
 
+require('./log');
 const { TypeHelper } = require('./typeHelper');
 
 /**
@@ -114,8 +115,7 @@ class EventSystem {
    * @returns {Array<any>}
    */
   CallRemote(name, target, ...args) {
-    log.event(`EventSystem.Call(${name}, ${target}${args.length > 0 ? `, ${args.join(', ')}` : ''})`);
-    return this._genericCall(this._remoteEvents, name, ...args);
+    log.event(`EventSystem.CallRemote(${name}, ${target}${args.length > 0 ? `, ${args.join(', ')}` : ''})`);
   }
 
 

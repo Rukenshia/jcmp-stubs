@@ -1,5 +1,6 @@
 'use strict';
 
+require('./log');
 const { TypeHelper } = require('./typeHelper');
 const { constructors, similarClasses } = require('./overrides');
 const hooks = require('./hooks');

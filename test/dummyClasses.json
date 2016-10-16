@@ -1,0 +1,74 @@
+[
+  {
+    "isConstructible": true,
+    "isAutoDestroy": true,
+    "canHaveCustomProperties": false,
+    "name": "EmptyClass",
+    "functions": [],
+    "properties": []
+  },
+  {
+    "isConstructible": true,
+    "isAutoDestroy": false,
+    "canHaveCustomProperties": false,
+    "name": "EmptyClassNoAutoDestroy",
+    "functions": [],
+    "properties": []
+  },
+  {
+    "isConstructible": true,
+    "isAutoDestroy": false,
+    "canHaveCustomProperties": false,
+    "name": "ClassWithProperties",
+    "functions": [],
+    "properties": [{
+      "name": "a", 
+      "isWriteable": false,
+      "type": "int"
+    }, {
+      "name": "b", 
+      "isWriteable": false,
+      "type": "class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >"
+    }, {
+      "name": "c", 
+      "isWriteable": false,
+      "type": "int"
+    }]
+  },
+  {
+    "isConstructible": true,
+    "isAutoDestroy": false,
+    "canHaveCustomProperties": false,
+    "name": "ClassWithFunctions",
+    "functions": [{
+      "name": "Test", 
+      "returnType": "void",
+      "args": []
+    }],
+    "properties": []
+  },
+  {
+    "isConstructible": true,
+    "isAutoDestroy": false,
+    "canHaveCustomProperties": false,
+    "name": "ClassWithFunctionsAndProperties",
+    "functions": [{
+      "name": "Test", 
+      "returnType": "void",
+      "args": []
+    }],
+    "properties": [{
+      "name": "a", 
+      "isWriteable": false,
+      "type": "int"
+    }, {
+      "name": "b", 
+      "isWriteable": false,
+      "type": "class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >"
+    }, {
+      "name": "c", 
+      "isWriteable": false,
+      "type": "int"
+    }]
+  }
+]
