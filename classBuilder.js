@@ -44,6 +44,44 @@ class ClassBuilder {
    */
   constructor() {
     /** @type {Map<string, Class>} */ this._classes = new Map();
+    /** @type {TypeHelper} */ this.typeHelper = new TypeHelper({
+      'string': [
+        'class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >',
+      ],
+      'number': [
+        /^((un)?signed )?(char|float|double|int|short)$/,
+      ],
+      'boolean': [
+        'bool',
+      ],
+      'function': [
+        'class std::shared_ptr<class scr::IScriptFunction>',
+      ],
+      'undefined': [
+        'void',
+      ],
+      
+
+      // Special Conversions
+      'Vector2': [
+        /class math::basic_vector2<(.*?)>/,
+      ],
+      'Vector3': [
+        /class math::basic_vector3<(.*?)>/,
+      ],
+      'JCMPNamespace': [
+        /public: (.*?)::JCMPScriptNamespace \* __ptr64/,
+      ],
+      'Array': [
+        /class std::vector<(.*?)>/,
+      ],
+      'Entity': [
+        /class ISyncableEntity( * __ptr64)?/,
+      ],
+      'PlayerNameTag': [
+        /class Nametag( * __ptr64)?/,
+      ],
+    });
 
     this._addHelperClasses();
   }
@@ -55,7 +93,7 @@ class ClassBuilder {
    */
   _addHelperClasses() {
     this._classes.set('Entity', class Entity { });
-    TypeHelper.addClass(this._classes.get('Entity'));
+    this.typeHelper.addClass(this._classes.get('Entity'));
   }
 
   /**
@@ -75,7 +113,7 @@ class ClassBuilder {
     data.forEach(obj => {
       const cls = cb._classes.get(obj.name);
       obj.properties.forEach(prop => {
-        const jsType = TypeHelper.toJSType(prop.type);
+        const jsType = cb.typeHelper.toJSType(prop.type);
         log.debug(`property ${obj.name}.${prop.name} type: ${jsType}`);
 
         const cls = cb._classes.get(obj.name);
@@ -88,11 +126,11 @@ class ClassBuilder {
         if (fn.name === 'Destroy') {
           return;
         }
-        const jsReturnType = TypeHelper.toJSType(fn.returnType);
+        const jsReturnType = cb.typeHelper.toJSType(fn.returnType);
         log.debug(`function ${obj.name}.${fn.name} return type: ${jsReturnType}`);
         cls.__metadata.functions[fn.name].jsReturnType = jsReturnType;
         fn.args.forEach((arg, idx) => {
-          const jsType = TypeHelper.toJSType(arg);
+          const jsType = cb.typeHelper.toJSType(arg);
           log.debug(`function ${obj.name}.${fn.name}[arg ${idx}] type: ${jsType}`);
           cls.__metadata.functions[fn.name].args[idx].jsType = jsType;
         });
@@ -126,7 +164,7 @@ class ClassBuilder {
       if (presentType === 'object') {
         const possibleClasses = [expected];
         if (expected === 'Entity') {
-          possibleClasses.push(...TypeHelper.entities);
+          possibleClasses.push(...this.typeHelper.entities);
         }
         if (typeof similarClasses[expected] !== 'undefined') {
           possibleClasses.push(...similarClasses[expected]);
@@ -187,7 +225,7 @@ class ClassBuilder {
         for (const propName in cls.__metadata.properties) {
           if (this.__metadata.properties[propName].value === unset) {
             this.__metadata.properties[propName] = {
-              value: TypeHelper.getDefaultValue(cls.__metadata.properties[propName].jsType),
+              value: cb.typeHelper.getDefaultValue(cls.__metadata.properties[propName].jsType),
             };
           }
         }
@@ -202,7 +240,7 @@ class ClassBuilder {
 
     const classHooks = hooks[obj.name] || {};
 
-    TypeHelper.addClass(obj.name);
+    this.typeHelper.addClass(obj.name);
 
     const destroyGuard = function() {
       if (this.__metadata.destroyed) {
@@ -238,10 +276,10 @@ class ClassBuilder {
 
         if (typeof classHooks[info.name] !== 'undefined') {
           log.debug(`executing hook for ${obj.name}.${info.name}`);
-          return classHooks[info.name].bind(this)(...args) || TypeHelper.getDefaultValue(cls.__metadata.functions[info.name].jsReturnType);
+          return classHooks[info.name].bind(this)(...args) || this.typeHelper.getDefaultValue(cls.__metadata.functions[info.name].jsReturnType);
         }
 
-        return TypeHelper.getDefaultValue(cls.__metadata.functions[info.name].jsReturnType);
+        return this.typeHelper.getDefaultValue(cls.__metadata.functions[info.name].jsReturnType);
       };
     };
     const genGet = name => {
