@@ -16,7 +16,7 @@ module.exports = {
   TypeHelper,
   EventSystem,
   _setup(builder, eventSystem, fn) {
-    const globalClass = new (classBuilder.getClass('global'))();
+    const globalClass = new (builder.getClass('global'))();
     globalClass.__metadata.properties['events'].value = eventSystem;
     builder._classes.forEach((cls, name) => {
       if (name === 'EventSystem' || name === 'global') {
