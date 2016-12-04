@@ -44,7 +44,7 @@ class ClassBuilder {
    */
   constructor() {
     /** @type {Map<string, Class>} */ this._classes = new Map();
-    /** @type {TypeHelper} */ this.typeHelper = new TypeHelper({
+    /** @type {TypeHelper} */ this.typeHelper = new TypeHelper(this, {
       'string': [
         'class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >',
       ],

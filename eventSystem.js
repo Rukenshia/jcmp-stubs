@@ -26,8 +26,10 @@ class EventSystem {
    * Creates a new Instance of the EventSystem
    * 
    * @param {Array<EventInfo>} builtin - JC3:MP builtin events
+   * @param {ClassBuilder} classBuilder - ClassBuilder instance
    */
-  constructor(builtin) {
+  constructor(classBuilder, builtin) {
+    /** @type {ClassBuilder} */ this._classBuilder = classBuilder;
     /** @type {Map<string, Array<function>>} */ this._events = new Map();
     /** @type {Map<string, Array<function>>} */ this._remoteEvents = new Map();
 
@@ -137,7 +139,7 @@ class EventSystem {
       args.push(...customArgs);
     } else {
       this._builtins.get(name).forEach(({ ptype }) => {
-        args.push(TypeHelper.getDefaultValue(ptype));
+        args.push(this._classBuilder.typeHelper.getDefaultValue(ptype));
       });
     }
 

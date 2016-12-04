@@ -2,13 +2,15 @@
 
 const { expect } = require('chai');
 const { EventSystem } = require('../eventSystem.js');
+const { ClassBuilder } = require('../classBuilder.js');
 
 describe('Event System', () => {
   let ev;
   global.log.config({ level: 5 });
+  const cb = new ClassBuilder();
 
   describe('constructing a new EventSystem', () => {
-    ev =  new EventSystem([]);
+    ev =  new EventSystem(cb, []);
     expect(ev).to.be.an.instanceof(EventSystem);
 
     it('has no events registered', () => {
