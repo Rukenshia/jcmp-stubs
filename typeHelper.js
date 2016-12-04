@@ -100,9 +100,9 @@ class TypeHelper {
    */
   getDefaultValue(jsType) {
     let defaultValue = this._getDefaultJSValue(jsType);
-    if (typeof defaultValue === 'undefined' && builder._classes.has(jsType)) {
+    if (typeof defaultValue === 'undefined' && this.classBuilder._classes.has(jsType)) {
       // try to construct the default value
-      const defaultCls = this._builder._classes.get(jsType);
+      const defaultCls = this.classBuilder._classes.get(jsType);
       defaultValue = new defaultCls();
     }
     return defaultValue;
