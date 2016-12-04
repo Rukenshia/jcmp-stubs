@@ -63,6 +63,15 @@ class ClassBuilder {
       
 
       // Special Conversions
+      'RGB': [
+        'SRGB'
+      ],
+      'LocalPlayer': [
+        /class LocalPlayerScripting( * __ptr64)?/,
+      ],
+      'Camera': [
+        /class CameraScripting( * __ptr64)?/,
+      ],
       'Vector2': [
         /class math::basic_vector2<(.*?)>/,
       ],
@@ -71,6 +80,9 @@ class ClassBuilder {
       ],
       'JCMPNamespace': [
         /public: (.*?)::JCMPScriptNamespace \* __ptr64/,
+      ],
+      'JCMPUINamespace': [
+        /public: (.*?)::JCMPUINamespace \* __ptr64/,
       ],
       'Array': [
         /class std::vector<(.*?)>/,
