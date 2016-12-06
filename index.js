@@ -30,5 +30,6 @@ module.exports = {
     for(const k in globalClass.__metadata.properties) {
       fn(k, globalClass[k]);
     }
-  }
+  },
+  _log: log,
 };

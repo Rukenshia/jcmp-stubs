@@ -1,6 +1,6 @@
 {
   "name": "jcmp-stubs",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "Use the JC3MP Scripting API without the JC3:MP Server",
   "main": "index.js",
   "scripts": {
