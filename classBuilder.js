@@ -131,6 +131,7 @@ class ClassBuilder {
         const cls = cb._classes.get(obj.name);
         cls.__metadata.properties[prop.name] = {
           jsType,
+          readOnly: !prop.isWriteable,
         };
       });
 
