@@ -42,9 +42,9 @@ class ClassBuilder {
   /**
    * Creates a new instance of ClassBuilder
    */
-  constructor() {
+  constructor(typeHints = {}) {
     /** @type {Map<string, Class>} */ this._classes = new Map();
-    /** @type {TypeHelper} */ this.typeHelper = new TypeHelper(this, {
+    /** @type {TypeHelper} */ this.typeHelper = new TypeHelper(this, Object.assign({
       'string': [
         'class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >',
       ],
@@ -93,7 +93,7 @@ class ClassBuilder {
       'PlayerNameTag': [
         /class Nametag( * __ptr64)?/,
       ],
-    });
+    }, typeHints));
 
     this._addHelperClasses();
   }
