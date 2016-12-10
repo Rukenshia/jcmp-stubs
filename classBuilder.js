@@ -60,39 +60,6 @@ class ClassBuilder {
       'undefined': [
         'void',
       ],
-      
-
-      // Special Conversions
-      'RGB': [
-        'SRGB'
-      ],
-      'LocalPlayer': [
-        /class LocalPlayerScripting( * __ptr64)?/,
-      ],
-      'Camera': [
-        /class CameraScripting( * __ptr64)?/,
-      ],
-      'Vector2': [
-        /class math::basic_vector2<(.*?)>/,
-      ],
-      'Vector3': [
-        /class math::basic_vector3<(.*?)>/,
-      ],
-      'JCMPNamespace': [
-        /public: (.*?)::JCMPScriptNamespace \* __ptr64/,
-      ],
-      'JCMPUINamespace': [
-        /public: (.*?)::JCMPUINamespace \* __ptr64/,
-      ],
-      'Array': [
-        /class std::vector<(.*?)>/,
-      ],
-      'Entity': [
-        /class ISyncableEntity( * __ptr64)?/,
-      ],
-      'PlayerNameTag': [
-        /class Nametag( * __ptr64)?/,
-      ],
     }, typeHints));
 
     this._addHelperClasses();
@@ -116,8 +83,8 @@ class ClassBuilder {
    * 
    * @returns {ClassBuilder}
    */
-  static fromDataObject(data) {
-    const cb = new ClassBuilder();
+  static fromDataObject(data, typeHints = {}) {
+    const cb = new ClassBuilder(typeHints);
     data.forEach(obj => {
       cb._classes.set(obj.name, cb._buildClass(obj));
     });
