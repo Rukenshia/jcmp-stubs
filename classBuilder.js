@@ -215,6 +215,7 @@ class ClassBuilder {
     cls.__metadata = {
       constructible: obj.isConstructible,
       auto_destroy: obj.isAutoDestroy,
+      customProperties: obj.canHaveCustomProperties,
       properties: {},
       functions: {},
     };
