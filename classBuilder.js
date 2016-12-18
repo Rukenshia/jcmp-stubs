@@ -214,6 +214,7 @@ class ClassBuilder {
     const cls = clsObj[obj.name];
     cls.__metadata = {
       constructible: obj.isConstructible,
+      auto_destroy: obj.isAutoDestroy,
       properties: {},
       functions: {},
     };
