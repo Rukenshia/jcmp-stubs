@@ -17,7 +17,6 @@ module.exports = {
   EventSystem,
   _setup(builder, eventSystem, fn) {
     const globalClass = new (builder.getClass('global'))();
-    globalClass.__metadata.properties['events'].value = eventSystem;
     builder._classes.forEach((cls, name) => {
       if (name === 'global') {
         return;
