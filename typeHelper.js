@@ -52,6 +52,10 @@ class TypeHelper {
         break;
       }
 
+      if (key === raw) {
+        return key;
+      }
+
       this.types[key].forEach(matcher => {
         if (jsType) {
           return;
