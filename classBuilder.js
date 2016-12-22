@@ -50,6 +50,7 @@ class ClassBuilder {
       ],
       'number': [
         /^((un)?signed )?(char|float|double|int|short)$/,
+        /uint[0-9]+_t/,
       ],
       'boolean': [
         'bool',
