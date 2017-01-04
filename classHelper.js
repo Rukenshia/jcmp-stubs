@@ -23,16 +23,17 @@ class ClassHelper {
    * Constructs a new Instance of the Class, allowing a handler to be executed before returning the instance;
    * 
    * @static
+   * @param {ClassBuilder} builder
    * @param {string} name - class name
    * @param {function()} fn - handler 
    * @param {*} ...args
    * @returns {Class}
    */
-  static build(name, fn = () => {}, ...args) {
-    if (!classBuilder._classes.has(name)) {
+  static build(builder, name, fn = () => {}, ...args) {
+    if (!builder._classes.has(name)) {
       throw new Error(`cannot build non-existing class ${name}`);
     }
-    const cls = new (classBuilder.getClass(name))(...args);
+    const cls = new (builder.getClass(name))(...args);
     fn({
       c: cls,
       set: (n, v) => ClassHelper.setPropertyUnchecked(cls, n, v),
