@@ -18,7 +18,7 @@ module.exports = {
   _setup(builder, eventSystem, fn) {
     const globalClass = new (builder.getClass('global'))();
     // in the jcmp class, set 'events' to our own event system
-    builder.getClass('jcmp')['events'] = eventSystem;
+    ClassHelper.setPropertyUnchecked(globalClass, 'jcmp', eventSystem);
 
     builder._classes.forEach((cls, name) => {
       if (name === 'global') {
