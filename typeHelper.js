@@ -27,6 +27,13 @@ class TypeHelper {
 
     this.types[name].push(new RegExp(`^struct ${name}$`));
     this.types[name].push(new RegExp(`class (\\w+::)?I?${name} \\* __ptr64`));
+
+    if (typeof name === 'string' && name.includes('Handling')) {
+      const pos = name.indexOf('Handling') + 8;
+
+      const sub = name.substr(0, pos - 8) + '(::)?Handling' + name.substr(pos).replace(/[A-Z]/g, '(::)?$&');
+      this.types[name].push(new RegExp(`struct (.*?)${sub}`));
+    }
   }
 
   /**
