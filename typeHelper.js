@@ -33,7 +33,6 @@ class TypeHelper {
 
       const sub = name.substr(0, pos) + name.substr(pos).replace(/[A-Z]/g, '(::)?$&');
       this.types[name].push(new RegExp(`struct (.*?)${sub}\\s*(\\* __ptr64)?\\s*$`));
-      console.log(this.types[name]);
     }
   }
 
